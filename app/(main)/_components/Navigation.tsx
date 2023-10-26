@@ -4,8 +4,10 @@ import { ElementRef, useEffect, useRef, useState } from "react";
 import { ChevronsLeft, MenuIcon } from "lucide-react";
 import { useMediaQuery } from "usehooks-ts";
 import { usePathname } from "next/navigation";
+import { useQuery } from "convex/react";
 import { cn } from "@/lib/utils";
 import { UserItem } from "./UserItem";
+import { api } from "@/convex/_generated/api";
 
 export const Navigation = () => {
   const pathname = usePathname();
@@ -15,6 +17,7 @@ export const Navigation = () => {
   const navbarRef = useRef<ElementRef<"div">>(null);
   const [isResetting, setIsResetting] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(isMobile);
+  const documents = useQuery(api.documents.get);
 
   const handleMouseMove = (e: MouseEvent) => {
     if (!isResizingRef.current) {
@@ -121,7 +124,9 @@ export const Navigation = () => {
         </div>
 
         <div className="mt-4">
-          <p>Documents</p>
+          {documents?.map((document) => (
+            <p key={document._id}>{document.title}</p>
+          ))}
         </div>
 
         <div
