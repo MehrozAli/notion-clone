@@ -1,12 +1,14 @@
 "use client";
 
-import { ElementRef, useEffect, useRef, useState } from "react";
-import { ChevronsLeft, MenuIcon } from "lucide-react";
+import { ElementRef, useCallback, useEffect, useRef, useState } from "react";
+import { ChevronsLeft, MenuIcon, PlusCircle } from "lucide-react";
 import { useMediaQuery } from "usehooks-ts";
 import { usePathname } from "next/navigation";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { UserItem } from "./UserItem";
+import { Item } from "./Item";
 import { api } from "@/convex/_generated/api";
 
 export const Navigation = () => {
@@ -18,6 +20,7 @@ export const Navigation = () => {
   const [isResetting, setIsResetting] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(isMobile);
   const documents = useQuery(api.documents.get);
+  const createDocument = useMutation(api.documents.create);
 
   const handleMouseMove = (e: MouseEvent) => {
     if (!isResizingRef.current) {
@@ -38,6 +41,7 @@ export const Navigation = () => {
       );
     }
   };
+
   const handleMouseUp = () => {
     isResizingRef.current = false;
     document.removeEventListener("mousemove", handleMouseMove);
@@ -55,7 +59,7 @@ export const Navigation = () => {
     document.addEventListener("mouseup", handleMouseUp);
   };
 
-  const resetWidth = () => {
+  const resetWidth = useCallback(() => {
     if (sidebarRef.current && navbarRef.current) {
       setIsCollapsed(false);
       setIsResetting(true);
@@ -69,7 +73,7 @@ export const Navigation = () => {
     }
 
     setTimeout(() => setIsResetting(false), 300);
-  };
+  }, [isMobile]);
 
   const collapse = () => {
     if (sidebarRef.current && navbarRef.current) {
@@ -84,13 +88,23 @@ export const Navigation = () => {
     }
   };
 
+  const handleCreate = () => {
+    const promise = createDocument({ title: "Untitled" });
+
+    toast.promise(promise, {
+      loading: "Creating a new note...",
+      success: "New note created!",
+      error: "Failed to create new note",
+    });
+  };
+
   useEffect(() => {
     if (isMobile) {
       collapse();
     } else {
       resetWidth();
     }
-  }, [isMobile]);
+  }, [isMobile, resetWidth]);
 
   useEffect(() => {
     if (isMobile) collapse();
@@ -121,6 +135,7 @@ export const Navigation = () => {
 
         <div>
           <UserItem />
+          <Item onClick={handleCreate} label="New page" icon={PlusCircle} />
         </div>
 
         <div className="mt-4">
