@@ -52,8 +52,6 @@ export const DocumentList = ({
     );
   }
 
-  console.log("Documents ::", documents);
-
   return (
     <>
       <p
