@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/themeProvider";
 import { ConvexClientProvider } from "@/components/providers/convexProvider";
 import { ModalProvider } from "@/components/providers/modalProvider";
+import { EdgeStoreProvider } from "@/lib/edgestore";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -36,17 +37,19 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ConvexClientProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            storageKey="jotion-theme-2"
-            disableTransitionOnChange
-            enableSystem
-          >
-            <Toaster position="bottom-center" />
-            <ModalProvider />
-            {children}
-          </ThemeProvider>
+          <EdgeStoreProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              storageKey="jotion-theme-2"
+              disableTransitionOnChange
+              enableSystem
+            >
+              <Toaster position="bottom-center" />
+              <ModalProvider />
+              {children}
+            </ThemeProvider>
+          </EdgeStoreProvider>
         </ConvexClientProvider>
       </body>
     </html>
